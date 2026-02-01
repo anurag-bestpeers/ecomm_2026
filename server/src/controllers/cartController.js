@@ -11,6 +11,15 @@ export const getCart = async (req, res) => {
     if (!cart) {
       // Create empty cart if doesn't exist
       cart = await Cart.create({ user: req.user._id, items: [] });
+    } else {
+      // FILTER out items where product is null (deleted products)
+      const originalLength = cart.items.length;
+      cart.items = cart.items.filter(item => item.product !== null);
+
+      // If any items were removed, save the cart
+      if (cart.items.length !== originalLength) {
+        await cart.save();
+      }
     }
 
     res.status(200).json({
@@ -88,11 +97,11 @@ export const addToCart = async (req, res) => {
     }
 
     await cart.save();
-    await cart.populate('items.product');
+    const populatedCart = await Cart.findById(cart._id).populate('items.product');
 
     res.status(200).json({
       success: true,
-      data: cart,
+      data: populatedCart,
       message: "Item added to cart"
     });
   } catch (error) {
@@ -155,11 +164,11 @@ export const updateCartItem = async (req, res) => {
 
     cart.items[itemIndex].quantity = quantity;
     await cart.save();
-    await cart.populate('items.product');
+    const populatedCart = await Cart.findById(cart._id).populate('items.product');
 
     res.status(200).json({
       success: true,
-      data: cart,
+      data: populatedCart,
       message: "Cart updated"
     });
   } catch (error) {
@@ -190,11 +199,11 @@ export const removeFromCart = async (req, res) => {
     );
 
     await cart.save();
-    await cart.populate('items.product');
+    const populatedCart = await Cart.findById(cart._id).populate('items.product');
 
     res.status(200).json({
       success: true,
-      data: cart,
+      data: populatedCart,
       message: "Item removed from cart"
     });
   } catch (error) {

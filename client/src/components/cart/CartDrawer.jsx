@@ -1,4 +1,5 @@
 import { useContext, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import CartContext from '../../context/CartContext';
 import CartItem from './CartItem';
 import { FaTimes, FaShoppingCart } from 'react-icons/fa';
@@ -49,9 +50,11 @@ const CartDrawer = ({ isOpen, onClose }) => {
           ) : (
             <>
               <div className="cart-items">
-                {cart.items.map((item) => (
-                  <CartItem key={item.product._id} item={item} />
-                ))}
+                {cart.items
+                  .filter(item => item && item.product && typeof item.product === 'object' && item.product._id)
+                  .map((item) => (
+                    <CartItem key={item.product._id} item={item} />
+                  ))}
               </div>
 
               <div className="cart-footer">
@@ -59,9 +62,9 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   <span>Total:</span>
                   <span className="total-amount">${totalAmount}</span>
                 </div>
-                <button className="checkout-btn">
+                <Link to="/checkout" className="checkout-btn" onClick={onClose}>
                   Proceed to Checkout
-                </button>
+                </Link>
               </div>
             </>
           )}

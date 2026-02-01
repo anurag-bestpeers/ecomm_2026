@@ -6,17 +6,21 @@ const CartItem = ({ item }) => {
   const { updateQuantity, removeItem, loading } = useContext(CartContext);
 
   const handleIncrease = async () => {
-    await updateQuantity(item.product._id, item.quantity + 1);
+    if (item.product?._id) {
+      await updateQuantity(item.product._id, item.quantity + 1);
+    }
   };
 
   const handleDecrease = async () => {
-    if (item.quantity > 1) {
+    if (item.product?._id && item.quantity > 1) {
       await updateQuantity(item.product._id, item.quantity - 1);
     }
   };
 
   const handleRemove = async () => {
-    await removeItem(item.product._id);
+    if (item.product?._id) {
+      await removeItem(item.product._id);
+    }
   };
 
   const subtotal = (item.price * item.quantity).toFixed(2);

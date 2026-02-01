@@ -13,7 +13,9 @@ export const protect = async (req, res, next) => {
       }
       const decoded = await jwt.verify(token, process.env.JWT_SECRET);
       const user = await User.findById(decoded.id);
-
+      if (!user) {
+        return res.status(401).json({ message: "User not found or account deactivated." });
+      }
       req.user = user;
       next();
     }

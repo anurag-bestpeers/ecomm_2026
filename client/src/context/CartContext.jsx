@@ -10,10 +10,10 @@ export const CartProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [itemCount, setItemCount] = useState(0);
 
-  // Calculate item count
+  // Calculate item count (unique products)
   const calculateItemCount = (cartData) => {
     if (!cartData || !cartData.items) return 0;
-    return cartData.items.reduce((total, item) => total + item.quantity, 0);
+    return cartData.items.length;
   };
 
   // Get cart

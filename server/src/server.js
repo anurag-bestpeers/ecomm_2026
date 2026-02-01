@@ -7,6 +7,7 @@ import { authRouter } from "./routes/authRoute.js";
 import { productRoutes } from "./routes/productRoutes.js";
 import { categoryRoute } from "./routes/CategoryRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 import fileUpload from "express-fileupload";
 
 const app = express();
@@ -24,6 +25,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoute);
 app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.get("/", (req, res) => {
   res.json({ message: 'E-Commerce API is running...' });

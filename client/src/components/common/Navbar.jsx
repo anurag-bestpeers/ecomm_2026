@@ -36,10 +36,19 @@ const Navbar = () => {
 
             {user ? (
               <>
+                <Link to="/orders" className="nav-link">
+                  My Orders
+                </Link>
+
                 {user.role === 'admin' && (
-                  <Link to="/admin/products" className="nav-link">
-                    Admin
-                  </Link>
+                  <>
+                    <Link to="/admin/products" className="nav-link">
+                      Products
+                    </Link>
+                    <Link to="/admin/orders" className="nav-link">
+                      Orders
+                    </Link>
+                  </>
                 )}
 
                 <button
