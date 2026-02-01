@@ -39,7 +39,7 @@ const productSchema = new mongoose.Schema({
   },
   category: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "category",
+    ref: "Category",
     required: [true, "Please provide product category"]
   },
   images: [
@@ -71,11 +71,11 @@ const productSchema = new mongoose.Schema({
 productSchema.methods.updateRatings = function () {
   if (this.reviews.length > 0) {
     const totalRating = this.reviews.reduce((sum, review) => sum + review.rating, 0);
-    this.ratings.average = totalRating / this.reviews.length;
-    this.ratings.count = this.reviews.length;
+    this.rating.average = totalRating / this.reviews.length;
+    this.rating.count = this.reviews.length;
   } else {
-    this.ratings.average = 0;
-    this.ratings.count = 0;
+    this.rating.average = 0;
+    this.rating.count = 0;
   }
 };
 
