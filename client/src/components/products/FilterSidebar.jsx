@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const FilterSidebar = ({ categories, onFilter }) => {
   const [filters, setFilters] = useState({
@@ -10,21 +10,39 @@ const FilterSidebar = ({ categories, onFilter }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+    const newFilters = { ...filters, [name]: value };
+    setFilters(newFilters);
+
+    // Auto-apply sort changes immediately
+    if (name === 'sort') {
+      console.log('Sort changed, auto-applying:', value);
+      onFilter(newFilters);
+    }
   };
 
   const handleApply = () => {
-    onFilter(filters);
+    console.log('Applying filters:', filters);
+    // Clean up empty values
+    const cleanFilters = {};
+    Object.keys(filters).forEach(key => {
+      if (filters[key] !== '' && filters[key] !== null && filters[key] !== undefined) {
+        cleanFilters[key] = filters[key];
+      }
+    });
+    console.log('Clean filters:', cleanFilters);
+    onFilter(cleanFilters);
   };
 
   const handleReset = () => {
-    setFilters({
+    const resetFilters = {
       category: '',
       minPrice: '',
       maxPrice: '',
       sort: 'newest',
-    });
-    onFilter({});
+    };
+    setFilters(resetFilters);
+    console.log('Resetting filters');
+    onFilter({ sort: 'newest' }); // Keep default sort
   };
 
   return (

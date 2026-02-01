@@ -32,7 +32,19 @@ const ProductList = () => {
   };
 
   const handleFilter = (newFilters) => {
-    const combinedFilters = { ...filters, ...newFilters, page: 1 };
+    console.log('handleFilter called with:', newFilters);
+    // Replace filters entirely, don't merge (except preserve search if it exists)
+    const combinedFilters = {
+      ...newFilters,
+      page: 1
+    };
+
+    // Preserve search term if it exists in current filters
+    if (filters.search) {
+      combinedFilters.search = filters.search;
+    }
+
+    console.log('Setting filters to:', combinedFilters);
     setFilters(combinedFilters);
     getProducts(combinedFilters);
   };

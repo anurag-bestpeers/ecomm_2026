@@ -1,15 +1,41 @@
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ProductContext from '../../context/ProductContext';
+import CartContext from '../../context/CartContext';
 import { FaStar } from 'react-icons/fa';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { product, loading, getProductById } = useContext(ProductContext);
+  const { cart, addToCart, loading: cartLoading } = useContext(CartContext);
+  const [quantity, setQuantity] = useState(1);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     getProductById(id);
   }, [id]);
+
+  // Check if product is already in cart
+  const isInCart = cart?.items?.some(item => item.product._id === product?._id);
+  const cartItem = cart?.items?.find(item => item.product._id === product?._id);
+
+  const handleAddToCart = async () => {
+    if (isInCart) {
+      setMessage(`⚠️ This item is already in your cart (${cartItem.quantity} items). Use the cart to update quantity.`);
+      setTimeout(() => setMessage(''), 4000);
+      return;
+    }
+
+    const result = await addToCart(product._id, quantity);
+    if (result.success) {
+      setMessage('✓ Added to cart!');
+      setQuantity(1); // Reset quantity after adding
+      setTimeout(() => setMessage(''), 3000);
+    } else {
+      setMessage(`✗ ${result.message}`);
+      setTimeout(() => setMessage(''), 3000);
+    }
+  };
 
   if (loading) return <div className="loading">Loading...</div>;
   if (!product) return <div className="error">Product not found</div>;
@@ -49,11 +75,57 @@ const ProductDetail = () => {
 
             <p className="description">{product.description}</p>
 
+            {product.stock > 0 && (
+              <div className="quantity-selector" style={{ marginTop: '1.5rem', marginBottom: '1rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
+                  Quantity:
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max={product.stock}
+                  value={quantity}
+                  onChange={(e) => setQuantity(Math.max(1, Math.min(product.stock, parseInt(e.target.value) || 1)))}
+                  style={{ width: '100px', padding: '0.5rem', borderRadius: '8px', border: '1px solid #ddd' }}
+                />
+              </div>
+            )}
+
+            {message && (
+              <div style={{
+                padding: '0.75rem',
+                marginBottom: '1rem',
+                borderRadius: '8px',
+                background: message.includes('✓')
+                  ? 'rgba(34, 197, 94, 0.12)'
+                  : message.includes('⚠️')
+                    ? 'rgba(245, 158, 11, 0.12)'
+                    : 'rgba(239, 68, 68, 0.12)',
+                color: message.includes('✓')
+                  ? '#16a34a'
+                  : message.includes('⚠️')
+                    ? '#d97706'
+                    : '#dc2626',
+                fontWeight: 600,
+                fontSize: '0.9375rem',
+                lineHeight: '1.5'
+              }}>
+                {message}
+              </div>
+            )}
+
             <button
               className="add-to-cart-btn"
-              disabled={product.stock === 0}
+              disabled={product.stock === 0 || cartLoading}
+              onClick={handleAddToCart}
             >
-              {product.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
+              {cartLoading
+                ? 'Adding...'
+                : isInCart
+                  ? 'Already in Cart'
+                  : product.stock > 0
+                    ? 'Add to Cart'
+                    : 'Out of Stock'}
             </button>
           </div>
         </div>
